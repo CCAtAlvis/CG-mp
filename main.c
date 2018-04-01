@@ -83,6 +83,17 @@ void setup () {
 	}
 }
 
+void movePlayer (unsigned short PlayerIndex, char direction) {
+	// TODO:
+	// depending upon the orentation of player
+	// move player in that direction
+	// before moving the player check if there is any obstacle i.e.
+	// an obstacle tile, destroyable tile or other player present at that position
+	// if not move the player
+	// while moving the player, calc its next postion and orentation
+	// also make its previous postion a blank tile
+}
+
 void main () {
 	int gd = DETECT, gm, flag = 0;
 	int x=10, y=10;
@@ -97,13 +108,12 @@ void main () {
 
 	while (1) {
 		//cleardevice();
+
 		if (kbhit()) {
 			ch = getch();
-			//printf("%d", ch);
 			flag = 1;
 		} else {
 			flag = 0;
-			//printf(".");
 		}
 
 		if (ch == 'q' || ch == 'Q')
@@ -118,6 +128,7 @@ void main () {
 				x += 10;
 				break;
 		}
+
 		//setcolor(RED);
 		//rectangle(x,getmaxy()-20, x+30, getmaxy()-10);
 		//delay(10);
