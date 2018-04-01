@@ -6,6 +6,7 @@ typedef struct player {
 	unsigned short x;
 	unsigned short y;
 	unsigned short bombs;
+	unsigned short life;
 } p1, p2;
 
 typedef struct tile {
@@ -18,6 +19,12 @@ typedef struct tile {
 	unsigned short y;
 } tiles[17][17];
 
+typedef struct bomb {
+	unsigned short x;
+	unsigned short y;
+	unsigned float timeToExplode;
+} bombs[6];
+
 unsigned short tileSize = 26;
 unsigned short tileSizeHalf = 13;
 unsigned short offset = 0;
@@ -27,6 +34,7 @@ void setup () {
 	unsigned short i, j;
 	unsigned short top, bottom, left, right;
 
+	// setup the level design
 	char levelDesign[17][17] = {
 		{'O',   'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O',   'O'},
 
@@ -55,6 +63,7 @@ void setup () {
 		{'O',   'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O',   'O'}
 	};
 
+	// initialize the level
 	for (i=0; i<17; i++) {
 		for (j=0; j<17; j++) {
 			// set fill style and boundry color
@@ -81,6 +90,10 @@ void setup () {
 			floodfill(top+1, left+1, color);
 		}
 	}
+
+	// TODO:
+	// initialize the players
+	// initialize the bombs array
 }
 
 void movePlayer (unsigned short PlayerIndex, char direction) {
@@ -95,7 +108,7 @@ void movePlayer (unsigned short PlayerIndex, char direction) {
 }
 
 void main () {
-	int gd = DETECT, gm, flag = 0;
+	int gd=DETECT, gm, flag=0;
 	int x=10, y=10;
 	char ch;
 
@@ -119,19 +132,25 @@ void main () {
 		if (ch == 'q' || ch == 'Q')
 			break;
 
-		if (flag)
-		switch (ch) {
-			case 77:
-				x += 10;
-				break;
-			case 'd':
-				x += 10;
-				break;
-		}
+		if (flag) {
+			switch (ch) {
+				// cases for player 1:
+				// using wasd keys
+				// and SPACE BAR for placing bomb
+				case 'd':
+					x += 10;
+					break;
 
-		//setcolor(RED);
-		//rectangle(x,getmaxy()-20, x+30, getmaxy()-10);
-		//delay(10);
+				// cases for player 2:
+				// using arrow keys
+				// and 0 for placing bomb
+				case 77:
+					x += 10;
+					break;
+
+			}
+		}
 	}
+
 	closegraph();
 }
