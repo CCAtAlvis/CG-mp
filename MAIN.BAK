@@ -8,7 +8,7 @@ typedef struct player {
     unsigned short y;
     unsigned short bombs;
     unsigned short life;
-} players[2];
+} p1, p2;
 
 // defination for tiles
 typedef struct tile {
@@ -33,8 +33,6 @@ typedef struct bomb {
 unsigned short tileSize = 26;
 unsigned short tileSizeHalf = 13;
 unsigned short offset = 0;
-unsigned short playerSize = 18;
-unsigned short playerSizeHalf = 9;
 
 // run this function to initilize variable and load the level
 void setup () {
@@ -56,7 +54,7 @@ void setup () {
         {'O',   'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B',   'O'},
         {'O',   'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D',   'O'},
 
-        {'O',   'O', 'O', 'O', 'O', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'O', 'O', 'O', 'O',   'O'},
+        {'O',   'O', 'O', 'O', 'O', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'O', 'O', 'O',   'O'},
 
         {'O',   'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D',   'O'},
         {'O',   'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B',   'O'},
@@ -114,45 +112,6 @@ void movePlayer (unsigned short PlayerIndex, char direction) {
     // if not move the player
     // while moving the player, calc its next postion and orientation
     // also make its previous postion a blank tile
-    unsigned short xCord = players[PlayerIndex];
-    unsigned short yCord = players[PlayerIndex];
-    unsigned short xActual = tileSizeHalf + xCord*tileSize;
-    unsigned short yActual = tileSizeHalf + yCord*tileSize;
-    unsigned short xTop,yTop,xBottom,yBottom;
-    unsigned int color;
-    setfillstyle(1,BLACK);
-    floodfill(xActual,yActual,BLACK);
-    switch(direction)
-    {
-    case 'N':
-        if(tiles[xCord-1][yCord]=='B')
-            xCord--;
-        break;
-    case 'E' :
-        if(tiles[xCord][yCord+1]=='B')
-            yCord++;
-        break;
-    case 'W' :
-        if(tiles[xCord][yCord-1]=='B')
-            yCord--;
-        break;
-    case 'S' :
-        if(tiles[xCord++][yCord]=='B')
-            xCord++;
-        break;
-     }
-    if(PlayerIndex==0)
-        color = BLUE;
-    else
-        color = RED;
-    xTop = (tileSizeHalf - playerSizeHalf) + xCord*tileSize;
-    yTop = (tileSizeHalf - playerSizeHalf) + yCord*tileSize;
-    xBottom = (tileSizeHalf + playerSizeHalf) + xCord*tileSize;
-    yBottom = (tileSizeHalf + playerSizeHalf) + yCord*tileSize;
-    setcolor(color);
-    rectangle(xTop,yTop,xBottom,yBottom);
-    setfillstyle(1,color);
-    floodfill(xTop+1,yTop+1,color);
 }
 
 // place the bomb!!! its that simple
@@ -166,11 +125,16 @@ void placeBomb (unsigned short PlayerIndex) {
     // if we place the bomb at the player location,
     // it would be a lot easy to calc everything
     // as we are not taking the orientation into consideraion
-    // moving and redrawing the player will also become a lot simpler
-    unsigned short xCord = players[PlayerIndex];
-    unsigned short yCord = players[PlayerIndex];
-    unsigned short xCenter = tileSizeHalf + xCord*tileSize;
-    unsigned short yCenter = tileSizeHalf + yCord*tileSize;
+    // moving and redrawing the player will also become a lot simpler 
+}
+
+// to manage the input and take action accordingly
+// also to keep main() clean
+void manageInput () {
+    // TODO:
+    // make this function work!
+    // basicaly shift appropriate content
+    // and also add return type (if any)
 }
 
 // this is the main game event function
@@ -183,11 +147,10 @@ void loop () {
 
 void main () {
     int gd=DETECT, gm, flag=0;
-    unsigned short player;
     // int x=10, y=10;
-    char ch, dir;
+    char ch;
 
-    //clrscr();
+    clrscr();
 
     initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
 
@@ -205,58 +168,25 @@ void main () {
         if (ch == 'q' || ch == 'Q')
             break;
 
-	if (flag) {
-		printf("%d",ch);
+        if (flag) {
             switch (ch) {
                 // cases for player 1:
                 // using wasd keys
                 // and SPACE BAR for placing bomb
-                case 'w':
-                    player = 0;
-                    dir = "N";
-                    break;
                 case 'd':
-                    player = 0;
-                    dir = "E";
+                    // x += 10;
                     break;
-                case 'a':
-                    player = 0;
-                    dir = "W";
-                    break;
-                case 'S':
-                    player = 0;
-                    dir = "S";
-                    break;
-                case ' ':
-                    player = 0;
-                    dir = "B";
 
                 // cases for player 2:
                 // using arrow keys
                 // and 0 for placing bomb
-                case 72: // up key
-                    player = 1;
-                    dir = "N";
+                case 77:
+                    // x += 10;
                     break;
-                case 77: // right key
-                    player = 1;
-                    dir = "E";
-                    break;
-                case 75: // left key
-                    player = 1;
-                    dir = "W";
-                    break;
-                case 74: // down key
-                    player = 1;
-                    dir = "S";
-                    break;
-                case 48: // for zero
-                    player = 1;
-                    dir = "B";
-                    break;
-
             }
-            movePlayer(player, dir);
+
+            // move the player 1 or 2 accordingly
+            // movePlayer(parameters goes here);
         }
 
         // reset flags etc.
