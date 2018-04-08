@@ -99,9 +99,36 @@ void setup () {
         }
     }
 
-    // TODO:
-    // initialize the players
     // initialize the bombs array
+    for (i=0; i<6; ++i) {
+        bombs[i].placed = 0;
+    }
+
+    // initialize the players
+    players[0].x = 1;
+    players[0].y = 1;
+    players[1].x = 15;
+    players[1].y = 15;
+
+    for (i=0; i<2; ++i) {
+        if (0==i)
+            color = BLUE;
+        else
+            color = RED;
+
+        players[i].bombs = 3;
+        players[i].life = 3;
+
+        top = (tileSizeHalf - playerSizeHalf) + players[i].x*tileSize;
+        left = (tileSizeHalf - playerSizeHalf) + players[i].x*tileSize;
+        bottom = (tileSizeHalf + playerSizeHalf) + players[i].x*tileSize;
+        right = (tileSizeHalf + playerSizeHalf) + players[i].x*tileSize;
+
+        setcolor(color);
+        rectangle(top, left, bottom , right);
+        setfillstyle(1, color);
+        floodfill(top+1, left+1, color);
+    }
 }
 
 // move player identified by PlayerIndex in the given direction
@@ -122,6 +149,7 @@ void movePlayer (unsigned short PlayerIndex, char direction) {
     unsigned int color;
     setfillstyle(1,BLACK);
     floodfill(xActual,yActual,BLACK);
+
     switch(direction)
     {
     case 'N':
@@ -140,11 +168,13 @@ void movePlayer (unsigned short PlayerIndex, char direction) {
         if(tiles[xCord++][yCord]=='B')
             xCord++;
         break;
-     }
+    }
+
     if(PlayerIndex==0)
         color = BLUE;
     else
         color = RED;
+
     xTop = (tileSizeHalf - playerSizeHalf) + xCord*tileSize;
     yTop = (tileSizeHalf - playerSizeHalf) + yCord*tileSize;
     xBottom = (tileSizeHalf + playerSizeHalf) + xCord*tileSize;
@@ -173,19 +203,12 @@ void placeBomb (unsigned short PlayerIndex) {
     unsigned short yCenter = tileSizeHalf + yCord*tileSize;
 }
 
-// this is the main game event function
-// called on every frame refresh
-void loop () {
-    // TODO:
-    // make this function work!
-    // and also the game
-}
-
 void main () {
     int gd=DETECT, gm, flag=0;
     unsigned short player;
     // int x=10, y=10;
     char ch, dir;
+    float time;
 
     //clrscr();
 
@@ -205,7 +228,7 @@ void main () {
         if (ch == 'q' || ch == 'Q')
             break;
 
-	if (flag) {
+        if (flag) {
 		printf("%d",ch);
             switch (ch) {
                 // cases for player 1:
