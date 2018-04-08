@@ -238,13 +238,14 @@ void resultScreen () {
     } else {
         printf("PLAYER 1 WINS!");
     }
+
+    printf("\n\n\n Thank you for playing our game!");
 }
 
 void main () {
     int gd=DETECT, gm, flag=0;
     unsigned short player;
-    // int x=10, y=10;
-    char ch, dir;
+    char ch, chPre, dir;
     float time;
 
     //clrscr();
@@ -256,11 +257,10 @@ void main () {
     gameState = 1;
 
     while (gameState) {
-        //cleardevice();
-
         if (kbhit()) {
             ch = getch();
-            flag = 1;
+            if (chPre != ch)
+                flag = 1;
         }
 
         if (ch == 'q' || ch == 'Q')
@@ -315,16 +315,26 @@ void main () {
                     player = 1;
                     dir = "B";
                     break;
-
             }
             movePlayer(player, dir);
         }
 
         // reset flags etc.
         flag = 0;
+        chPre = ch;
+
+        for (i=0; i<6; ++i) {
+            if (bombs[i].placed) {
+                bombs[i] -= 1.1;
+                explodeBomb(i);
+            }
+        }
+
+        // delay frame for 1 millisec
+        delay(1);
     }
+    closegraph();
 
     // a thank you screen if you want!
-
-    closegraph();
+    resultScreen();
 }
