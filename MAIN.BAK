@@ -429,7 +429,7 @@ void main () {
             }
             movePlayer(player, dir);
 	} else {
-		chPre = 'g';
+		chPre = '';
 	}
 
 	// reset flags etc.
