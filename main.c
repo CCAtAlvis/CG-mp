@@ -35,6 +35,15 @@ unsigned short tileSizeHalf = 13;
 unsigned short offset = 0;
 unsigned short playerSize = 18;
 unsigned short playerSizeHalf = 9;
+unsigned short gameState = 0;
+
+// all functions definations
+void setup ();
+void movePlayer (unsigned short, char);
+void placeBomb (unsigned short);
+void playerHit (unsigned short);
+void gameOver ();
+void resultScreen ();
 
 // run this function to initilize variable and load the level
 void setup () {
@@ -179,10 +188,14 @@ void movePlayer (unsigned short PlayerIndex, char direction) {
     yTop = (tileSizeHalf - playerSizeHalf) + yCord*tileSize;
     xBottom = (tileSizeHalf + playerSizeHalf) + xCord*tileSize;
     yBottom = (tileSizeHalf + playerSizeHalf) + yCord*tileSize;
+
     setcolor(color);
     rectangle(xTop,yTop,xBottom,yBottom);
     setfillstyle(1,color);
     floodfill(xTop+1,yTop+1,color);
+
+    players[PlayerIndex].x = xCord;
+    players[PlayerIndex].y = yCord;
 }
 
 // place the bomb!!! its that simple
@@ -203,6 +216,30 @@ void placeBomb (unsigned short PlayerIndex) {
     unsigned short yCenter = tileSizeHalf + yCord*tileSize;
 }
 
+void playerHit(unsigned short PlayerIndex) {
+    if (--players[PlayerIndex].life <= 0) {
+        gameOver();
+    }
+}
+
+void gameOver() {
+    // game is now over
+    // walk on home boy!
+    // and do something useful to actually make game over
+    // or simply make games state = 0
+    gameState = 0;
+}
+
+void resultScreen () {
+    if (players[0].life == players[1].life) {
+        printf("THE GAME IS DRAW");
+    } else if(players[0].life > 0) {
+        printf("PLAYER 0 WINS!");
+    } else {
+        printf("PLAYER 1 WINS!");
+    }
+}
+
 void main () {
     int gd=DETECT, gm, flag=0;
     unsigned short player;
@@ -216,8 +253,9 @@ void main () {
 
     // lets setup the level
     setup();
+    gameState = 1;
 
-    while (1) {
+    while (gameState) {
         //cleardevice();
 
         if (kbhit()) {
