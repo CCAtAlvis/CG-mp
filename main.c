@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <graphics.h>
+#include<time.h>
 
 // lets define the player struct
 typedef struct player {
@@ -26,7 +27,7 @@ typedef struct bomb {
     unsigned short x;
     unsigned short y;
     float timeToExplode;
-    unsigned short placedBy;
+    unsigned short placed;
 } bombs[6];
 
 // some global variable declaration
@@ -35,6 +36,7 @@ unsigned short tileSizeHalf = 13;
 unsigned short offset = 0;
 unsigned short playerSize = 18;
 unsigned short playerSizeHalf = 9;
+unsigned short bombRadius = 6;
 
 // run this function to initilize variable and load the level
 void setup () {
@@ -106,16 +108,9 @@ void setup () {
 
 // move player identified by PlayerIndex in the given direction
 void movePlayer (unsigned short PlayerIndex, char direction) {
-    // TODO:
-    // depending upon the orientation of player
-    // move player in that direction
-    // before moving the player check if there is any obstacle i.e.
-    // an obstacle tile, destroyable tile or other player present at that position
-    // if not move the player
-    // while moving the player, calc its next postion and orientation
-    // also make its previous postion a blank tile
-    unsigned short xCord = players[PlayerIndex];
-    unsigned short yCord = players[PlayerIndex];
+
+    unsigned short xCord = players[PlayerIndex].x;
+    unsigned short yCord = players[PlayerIndex].y;
     unsigned short xActual = tileSizeHalf + xCord*tileSize;
     unsigned short yActual = tileSizeHalf + yCord*tileSize;
     unsigned short xTop,yTop,xBottom,yBottom;
@@ -125,20 +120,23 @@ void movePlayer (unsigned short PlayerIndex, char direction) {
     switch(direction)
     {
     case 'N':
-        if(tiles[xCord-1][yCord]=='B')
+        if(tiles[xCord-1][yCord].type=='B')
             xCord--;
         break;
     case 'E' :
-        if(tiles[xCord][yCord+1]=='B')
+        if(tiles[xCord][yCord+1].type=='B')
             yCord++;
         break;
     case 'W' :
-        if(tiles[xCord][yCord-1]=='B')
+        if(tiles[xCord][yCord-1].type=='B')
             yCord--;
         break;
     case 'S' :
-        if(tiles[xCord++][yCord]=='B')
+        if(tiles[xCord++][yCord].type=='B')
             xCord++;
+        break;
+    case 'B' :
+        placeBomb(PlayerIndex);
         break;
      }
     if(PlayerIndex==0)
@@ -155,22 +153,127 @@ void movePlayer (unsigned short PlayerIndex, char direction) {
     floodfill(xTop+1,yTop+1,color);
 }
 
-// place the bomb!!! its that simple
 void placeBomb (unsigned short PlayerIndex) {
-    // TODO:
-    // 1)
-    // place the bomb in front of the player
-    // if we are doing that we will have to calc
-    // next coodrs from its orientation etc, like in movePlayer
-    // 2)
-    // if we place the bomb at the player location,
-    // it would be a lot easy to calc everything
-    // as we are not taking the orientation into consideraion
-    // moving and redrawing the player will also become a lot simpler
-    unsigned short xCord = players[PlayerIndex];
-    unsigned short yCord = players[PlayerIndex];
+    
+    unsigned short xCord = players[PlayerIndex].x;
+    unsigned short yCord = players[PlayerIndex].y;
     unsigned short xCenter = tileSizeHalf + xCord*tileSize;
     unsigned short yCenter = tileSizeHalf + yCord*tileSize;
+    unsigned int bombColor = YELLOW;
+    unsigned short i;
+    if(players[PlayerIndex].bombs>0)
+    {
+        setcolor(bombColor);
+        circle(xCenter,yCenter,bombRadius);
+        setfillstyle(1,bombColor);
+        floodfill(xCenter,yCenter,bombColor);
+        players[PlayerIndex].bombs--;
+        for(i=0;i<6;i++)
+        {
+            if(bombs[i].placed==0)
+                break;                        
+        }
+        bombs[i].placed = 1;
+        bombs[i].x = xCord;
+        bombs[i].y = yCord;
+        bombs[i].timeToExplode = 5000;
+    }
+}
+
+void explodeBomb(unsigned short index)
+{
+    unsigned short xCord = bombs[index].x;
+    unsigned short yCord = bombs[index].y;
+    unsigned short xCenter = tileSizeHalf + xCord*tileSize;
+    unsigned short yCenter = tileSizeHalf + yCord*tileSize;
+    unsigned short xp1 = players[0].x;
+    unsigned short yp1 = players[0].y;
+    unsigned short xp2 = players[1].x;
+    unsigned short yp2 = players[1].y;
+    int i, j, k, l;
+
+    setcolor(YELLOW);
+    setfillstyle(1,YELLOW);
+
+    for (i=0;i<3;i++)
+    {
+        if(xCord==xp1&&yCord-1-i==yp1)
+                //decrement life p1
+        else if(xCord==xp2&&yCord-1-i==yp2)
+                //decrement life p2
+
+        if(xCord-1-i==xp1&&yCord==yp1)
+                //decrement life p1
+        else if(xCord-1-i==xp2&&yCord==yp2)
+                //decrement life p2
+
+        if(xCord+1+i==xp1&&yCord==yp1)
+                //decrement life p1
+        else if(xCord+1+i==xp2&&yCord==yp2)
+                //decrement life p2
+
+        if(xCord==xp1&&yCord+i+1==yp1)
+                //decrement life p1
+        else if(xCord==xp2&&yCord+i+1==yp2)
+                //decrement life p2
+
+        for (j=0; j<=i; ++j) {
+            l = i;
+            for (k=3*l; k<=3*(l+1); k++) {
+                setfillstyle(1, YELLOW);
+
+                if(tiles[xCord][yCord-(j+1)].type!='O')
+                {
+                    circle(xCenter,yCenter-((j+1)*tileSize), j);
+                    floodfill(xCenter,yCenter-((j+1)*tileSize), YELLOW);
+                }
+
+                if(tiles[xCord+(j+1)][yCord].type!='O')
+                {
+                    circle(xCenter+((j+1)*tileSize),yCenter,j);
+                    floodfill(xCenter+((j+1)*tileSize),yCenter,YELLOW);
+                }
+
+                if(tiles[xCord][yCord+(j+1)].type!='O')
+                {
+                    circle(xCenter,yCenter+((j+1)*tileSize),j);
+                    floodfill(xCenter,yCenter+((j+1)*tileSize),YELLOW);
+                }
+
+                if(tiles[xCord-(j+1)][yCord].type!='O')
+                {
+                    circle(xCenter-((j+1)*tileSize),yCenter,j);
+                    floodfill(xCenter-((j+1)*tileSize),yCenter,YELLOW);
+                }
+            }
+            l--;
+        }
+
+        // for(j=3*i;j<=3*(i+1);j++)
+        // {
+        //     setfillstyle(1, YELLOW);
+        //     if(tiles[xCord][yCord-1].type!='O')
+        //     {
+        //         circle(xCenter,yCenter-1*tileSize, j);
+        //         floodfill(xCenter,yCenter-1*tileSize, YELLOW);
+        //     }
+        //     if(tiles[xCord+1][yCord].type!='O')
+        //     {
+        //         circle(xCenter+1*tileSize,yCenter,j);
+        //         floodfill(xCenter+1*tileSize,yCenter,YELLOW);
+        //     }
+        //     if(tiles[xCord][yCord+1].type!='O')
+        //     {
+        //         circle(xCenter,yCenter+1*tileSize,j);
+        //         floodfill(xCenter,yCenter+1*tileSize,YELLOW);
+        //     }
+        //     if(tiles[xCord-1][yCord].type!='O')
+        //     {
+        //         circle(xCenter-1*tileSize,yCenter,j);
+        //         floodfill(xCenter-1*tileSize,yCenter,YELLOW);
+        //     }
+        // }
+    }    
 }
 
 // this is the main game event function
