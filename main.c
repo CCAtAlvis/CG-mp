@@ -37,6 +37,16 @@ unsigned short offset = 0;
 unsigned short playerSize = 18;
 unsigned short playerSizeHalf = 9;
 unsigned short bombRadius = 6;
+unsigned short gameState = 0;
+
+// all functions definations
+void setup ();
+void movePlayer (unsigned short, char);
+void placeBomb (unsigned short);
+void explodeBomb (unsigned short);
+void playerHit (unsigned short);
+void gameOver ();
+void resultScreen ();
 
 // run this function to initilize variable and load the level
 void setup () {
@@ -101,9 +111,36 @@ void setup () {
         }
     }
 
-    // TODO:
-    // initialize the players
     // initialize the bombs array
+    for (i=0; i<6; ++i) {
+        bombs[i].placed = 0;
+    }
+
+    // initialize the players
+    players[0].x = 1;
+    players[0].y = 1;
+    players[1].x = 15;
+    players[1].y = 15;
+
+    for (i=0; i<2; ++i) {
+        if (0==i)
+            color = BLUE;
+        else
+            color = RED;
+
+        players[i].bombs = 3;
+        players[i].life = 3;
+
+        top = (tileSizeHalf - playerSizeHalf) + players[i].x*tileSize;
+        left = (tileSizeHalf - playerSizeHalf) + players[i].x*tileSize;
+        bottom = (tileSizeHalf + playerSizeHalf) + players[i].x*tileSize;
+        right = (tileSizeHalf + playerSizeHalf) + players[i].x*tileSize;
+
+        setcolor(color);
+        rectangle(top, left, bottom , right);
+        setfillstyle(1, color);
+        floodfill(top+1, left+1, color);
+    }
 }
 
 // move player identified by PlayerIndex in the given direction
@@ -117,6 +154,7 @@ void movePlayer (unsigned short PlayerIndex, char direction) {
     unsigned int color;
     setfillstyle(1,BLACK);
     floodfill(xActual,yActual,BLACK);
+
     switch(direction)
     {
     case 'N':
@@ -138,19 +176,25 @@ void movePlayer (unsigned short PlayerIndex, char direction) {
     case 'B' :
         placeBomb(PlayerIndex);
         break;
-     }
+    }
+
     if(PlayerIndex==0)
         color = BLUE;
     else
         color = RED;
+
     xTop = (tileSizeHalf - playerSizeHalf) + xCord*tileSize;
     yTop = (tileSizeHalf - playerSizeHalf) + yCord*tileSize;
     xBottom = (tileSizeHalf + playerSizeHalf) + xCord*tileSize;
     yBottom = (tileSizeHalf + playerSizeHalf) + yCord*tileSize;
+
     setcolor(color);
     rectangle(xTop,yTop,xBottom,yBottom);
     setfillstyle(1,color);
     floodfill(xTop+1,yTop+1,color);
+
+    players[PlayerIndex].x = xCord;
+    players[PlayerIndex].y = yCord;
 }
 
 void placeBomb (unsigned short PlayerIndex) {
@@ -276,19 +320,37 @@ void explodeBomb(unsigned short index)
     }    
 }
 
-// this is the main game event function
-// called on every frame refresh
-void loop () {
-    // TODO:
-    // make this function work!
-    // and also the game
+void playerHit(unsigned short PlayerIndex) {
+    if (--players[PlayerIndex].life <= 0) {
+        gameOver();
+    }
+}
+
+void gameOver() {
+    // game is now over
+    // walk on home boy!
+    // and do something useful to actually make game over
+    // or simply make games state = 0
+    gameState = 0;
+}
+
+void resultScreen () {
+    if (players[0].life == players[1].life) {
+        printf("THE GAME IS DRAW");
+    } else if(players[0].life > 0) {
+        printf("PLAYER 0 WINS!");
+    } else {
+        printf("PLAYER 1 WINS!");
+    }
+
+    printf("\n\n\n Thank you for playing our game!");
 }
 
 void main () {
     int gd=DETECT, gm, flag=0;
     unsigned short player;
-    // int x=10, y=10;
-    char ch, dir;
+    char ch, chPre, dir;
+    float time;
 
     //clrscr();
 
@@ -296,19 +358,19 @@ void main () {
 
     // lets setup the level
     setup();
+    gameState = 1;
 
-    while (1) {
-        //cleardevice();
-
+    while (gameState) {
         if (kbhit()) {
             ch = getch();
-            flag = 1;
+            if (chPre != ch)
+                flag = 1;
         }
 
         if (ch == 'q' || ch == 'Q')
             break;
 
-	if (flag) {
+        if (flag) {
 		printf("%d",ch);
             switch (ch) {
                 // cases for player 1:
@@ -357,16 +419,26 @@ void main () {
                     player = 1;
                     dir = "B";
                     break;
-
             }
             movePlayer(player, dir);
         }
 
         // reset flags etc.
         flag = 0;
+        chPre = ch;
+
+        for (i=0; i<6; ++i) {
+            if (bombs[i].placed) {
+                bombs[i] -= 1.1;
+                explodeBomb(i);
+            }
+        }
+
+        // delay frame for 1 millisec
+        delay(1);
     }
+    closegraph();
 
     // a thank you screen if you want!
-
-    closegraph();
+    resultScreen();
 }
