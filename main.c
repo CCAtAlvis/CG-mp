@@ -54,7 +54,7 @@ void setup () {
         {'O',   'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B',   'O'},
         {'O',   'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D',   'O'},
 
-        {'O',   'O', 'O', 'O', 'O', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'O', 'O', 'O',   'O'},
+        {'O',   'O', 'O', 'O', 'O', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'O', 'O', 'O', 'O',   'O'},
 
         {'O',   'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D', 'O', 'D',   'O'},
         {'O',   'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B', 'D', 'B',   'O'},
@@ -128,15 +128,6 @@ void placeBomb (unsigned short PlayerIndex) {
     // moving and redrawing the player will also become a lot simpler 
 }
 
-// to manage the input and take action accordingly
-// also to keep main() clean
-void manageInput () {
-    // TODO:
-    // make this function work!
-    // basicaly shift appropriate content
-    // and also add return type (if any)
-}
-
 // this is the main game event function
 // called on every frame refresh
 void loop () {
@@ -147,10 +138,11 @@ void loop () {
 
 void main () {
     int gd=DETECT, gm, flag=0;
+    unsigned short player;
     // int x=10, y=10;
-    char ch;
+    char ch, dir;
 
-    clrscr();
+    //clrscr();
 
     initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
 
@@ -173,20 +165,52 @@ void main () {
                 // cases for player 1:
                 // using wasd keys
                 // and SPACE BAR for placing bomb
-                case 'd':
-                    // x += 10;
+                case 'w':
+                    player = 0;
+                    dir = "N";
                     break;
+                case 'd':
+                    player = 0;
+                    dir = "E";
+                    break;
+                case 'a':
+                    player = 0;
+                    dir = "W";
+                    break;
+                case 'S':
+                    player = 0;
+                    dir = "S";
+                    break;
+                case ' ':
+                    player = 0;
+                    dir = "B";
 
                 // cases for player 2:
                 // using arrow keys
                 // and 0 for placing bomb
-                case 77:
-                    // x += 10;
+                case 72: // up key
+                    player = 1;
+                    dir = "N";
                     break;
-            }
+                case 77: // right key
+                    player = 1;
+                    dir = "E";
+                    break;
+                case 75: // left key
+                    player = 1;
+                    dir = "W";
+                    break;
+                case 74: // down key
+                    player = 1;
+                    dir = "S";
+                    break;
+                case 48: // for zero
+                    player = 1;
+                    dir = "B";
+                    break;
 
-            // move the player 1 or 2 accordingly
-            // movePlayer(parameters goes here);
+            }
+            movePlayer(player, dir);
         }
 
         // reset flags etc.
